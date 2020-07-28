@@ -20,32 +20,56 @@
 /* Private define ------------------------------------------------------------*/
 #define KEY_CTRL_LED1  KEY_2
 #define KEY_CTRL_LED2  KEY_5
+#define KEY_CTRL_LED3  KEY_8
 /* Private macro -------------------------------------------------------------*/
 /* Private variables ---------------------------------------------------------*/
 extern bool g_10msFlag;
-extern bool g_20msFlag;
 /* Private function prototypes -----------------------------------------------*/
 /* Private function ----------------------------------------------------------*/
 
-void AnalyzeKeyAction(void)
+/**
+  * @brief      处理控制led1按键动作回调函数.
+  * @param[in]  emKeyName   按键.
+  * @param[in]  emKeyAction 按键动作.
+  * @retval     None.
+  */
+static void OnProcessCtrlLed1(KEY_NameTypeDef emKeyName, KEY_ActionTypeDef emKeyAction)
 {
-	for (i = 0; i < KEY_MAX_NUM; i++)
-	{
-		keyVal[i] = KEY_ReadAction(i);
-	}
-	
-	if (KEY_CONFIRM_ACTION(keyVal[KEY_CTRL_LED1], KEY_SHORT_LOOSEN))
+	if (emKeyAction == KEY_IS_LOOSEN)
 	{
 		LED1_CRTL = !LED1_CRTL;
 	}
+}
+
+/**
+  * @brief      处理按键动作回调函数.
+  * @param[in]  emKeyName   按键.
+  * @param[in]  emKeyAction 按键动作.
+  * @retval     None.
+  */
+static void OnProcessKeyAction(KEY_NameTypeDef emKeyName, KEY_ActionTypeDef emKeyAction)
+{
+    switch (emKeyName)
+    {
+    case KEY_CTRL_LED2:
+		if (emKeyAction == KEY_IS_LOOSEN)
+		{
+			LED2_CRTL = !LED2_CRTL;
+		}
+        break;
+    case KEY_CTRL_LED3:
+		if (emKeyAction == KEY_IS_LOOSEN)
+		{
+			LED3_CRTL = 1;
+		}
+		else
+		{
+			LED3_CRTL = 0;
+		}
+        break;
+	default:
 	
-	if (KEY_CONFIRM_ACTION(keyVal[KEY_CTRL_LED2], KEY_SHORT_HOLD_PRESS))
-	{
-		LED2_CRTL = 1;
-	}
-	else
-	{
-		LED2_CRTL = 0;
+		break;
 	}
 }
 
@@ -54,25 +78,25 @@ int mian(void)
 	uint8_t i;
 	uint8_t keyVal[KEY_MAX_NUM];
 	
-	KEY_UserInit();
+	FML_KEY_ManageInit();
+	
+	FML_KEY_Register(KEY_CTRL_LED1, OnProcessCtrlLed1);
+	FML_KEY_Register(KEY_CTRL_LED2, OnProcessKeyAction);
+	FML_KEY_Register(KEY_CTRL_LED3, OnProcessKeyAction);
 	
 	while(1)
 	{
 		if (g_10msFlag)
 		{
-			KEY_ScanTask();
+			FML_KEY_ScanTask();
 			
 			g_10msFlag = 0;
 		}
-		
-		/* 支持按键异步处理 */
-		if (g_20msFlag)
-		{
-			AnalyzeKeyAction();
-			
-			g_20msFlag = 0;
-		}
 	}
+	
+	FML_KEY_UnRegister(KEY_CTRL_LED1);
+	FML_KEY_UnRegister(KEY_CTRL_LED2);
+	FML_KEY_UnRegister(KEY_CTRL_LED3);
 }
 
 
