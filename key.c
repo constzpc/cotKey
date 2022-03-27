@@ -46,7 +46,7 @@ typedef struct
 
     uint16_t uiAntiShakeTime;                   /*!< 指定所选按键的防抖时间, 该参数单位为1ms */
     
-    uint16_t refreshNotifyTic;
+    uint16_t refreshNotifyTic;					/*!< 指定所选按键的触发回调通知函数的定时计时, 单位为1ms */
 
     KeyFunCB pfnKeyNotifyFun;                   /*!< 指定所选按键的动作改变回调通知函数 */
 } KeyManage_t;
@@ -294,14 +294,6 @@ void KEY_Scan(uint16_t cycleTime)
                 sg_tKeyManage[key].pfnKeyNotifyFun((IoKeyType_e)key, sg_tKeyManage[key].eKeyAction);
             }
         }
-
-//        if (sg_tKeyManage[key].refreshNotifyTic == 0 || sg_tKeyManage[key].eKeyAction != sg_tKeyManage[key].eKeyActionBak)
-//        {
-//            if (sg_tKeyManage[key].pfnKeyNotifyFun != NULL)
-//            {
-//                sg_tKeyManage[key].pfnKeyNotifyFun((IoKeyType_e)key, sg_tKeyManage[key].eKeyAction);
-//            }
-//        }
 
         sg_tKeyManage[key].eKeyActionBak = sg_tKeyManage[key].eKeyAction;
     }
